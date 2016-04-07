@@ -2,6 +2,8 @@ package org.volume;
 
 import android.media.AudioManager;
 
+import static android.media.AudioManager.ADJUST_LOWER;
+import static android.media.AudioManager.ADJUST_RAISE;
 import static android.media.AudioManager.FLAG_PLAY_SOUND;
 import static android.media.AudioManager.STREAM_MUSIC;
 
@@ -10,7 +12,7 @@ import static android.media.AudioManager.STREAM_MUSIC;
  */
 public class VolumeManager {
     public interface OnVolumeChangeListener {
-        void onVolumeChange(int newLevel, int maxLevel);
+        void onVolumeChange(int oldLevel, int newLevel, int maxLevel);
     }
 
     private AudioManager audioManager;
@@ -24,35 +26,54 @@ public class VolumeManager {
         adjustVolume(direction);
     }
 
-    public void setVolume(int speed, int level) {
-        audioManager.setStreamVolume(STREAM_MUSIC, level, FLAG_PLAY_SOUND);
-        notifyVolumeChange();
-    }
+    public void onSpeedChange(int oldSpeed, int newSpeed) {
+        if (oldSpeed < newSpeed) {
+            raiseVolumeIfNeeded(oldSpeed, newSpeed);
+        }
 
-    public void onSpeedUpdate(int newSpeed) {
-
-    }
-
-    private void adjustVolume(int direction) {
-        audioManager.adjustStreamVolume(STREAM_MUSIC, direction, FLAG_PLAY_SOUND);
-        notifyVolumeChange();
-    }
-
-    private void notifyVolumeChange() {
-        int newLevel = audioManager.getStreamVolume(STREAM_MUSIC);
-        int maxLevel = audioManager.getStreamMaxVolume(STREAM_MUSIC);
-
-        if (onVolumeChangeListener != null) {
-            onVolumeChangeListener.onVolumeChange(newLevel, maxLevel);
+        if (oldSpeed > newSpeed) {
+            lowerVolumeIfNeeded(oldSpeed, newSpeed);
         }
     }
 
-    public void setInitialVolume() {
-        int maxVolume = audioManager.getStreamMaxVolume(STREAM_MUSIC);
-        int initialLevel = maxVolume * 2 / 3;
-        setVolume(SpeedManager.SPEED_UNKNOWN, initialLevel);
+    private void lowerVolumeIfNeeded(int oldSpeed, int newSpeed) {
+        if (oldSpeed > 85 && newSpeed < 85) {
+            adjustVolume(ADJUST_LOWER);
+        }
+
+        if (oldSpeed > 60 && newSpeed < 60) {
+            adjustVolume(ADJUST_LOWER);
+        }
     }
 
+    private void raiseVolumeIfNeeded(int oldSpeed, int newSpeed) {
+        if (oldSpeed < 60 && newSpeed > 60) {
+            adjustVolume(ADJUST_RAISE);
+        }
+
+        if (oldSpeed < 85 && newSpeed > 85) {
+            adjustVolume(ADJUST_RAISE);
+        }
+    }
+
+    private void adjustVolume(int direction) {
+        int oldLevel = getCurrentVolume();
+        audioManager.adjustStreamVolume(STREAM_MUSIC, direction, FLAG_PLAY_SOUND);
+        notifyVolumeChange(oldLevel);
+    }
+
+    public int getCurrentVolume() {
+        return audioManager.getStreamVolume(STREAM_MUSIC);
+    }
+
+    private void notifyVolumeChange(int oldLevel) {
+        int newLevel = getCurrentVolume();
+        int maxLevel = audioManager.getStreamMaxVolume(STREAM_MUSIC);
+
+        if (onVolumeChangeListener != null) {
+            onVolumeChangeListener.onVolumeChange(oldLevel, newLevel, maxLevel);
+        }
+    }
 
     public void setOnVolumeChangeListener(OnVolumeChangeListener onVolumeChangeListener) {
         this.onVolumeChangeListener = onVolumeChangeListener;
