@@ -8,9 +8,10 @@ import android.os.Bundle;
 /**
  * Created by mtkachenko on 06/04/16.
  */
-public class SpeedManager {
+public class SpeedManager implements LocationListener {
     public interface OnSpeedUpdateListener {
         void onSpeedUpdate(int newSpeed, long time);
+
         void onSpeedChange(int oldSpeed, int newSpeed, long time);
     }
 
@@ -26,11 +27,11 @@ public class SpeedManager {
     private OnSpeedUpdateListener onSpeedUpdateListener;
 
     public void startListening() {
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, locationListener);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this);
     }
 
     public void stopListening() {
-        locationManager.removeUpdates(locationListener);
+        locationManager.removeUpdates(this);
     }
 
     public int getCurrentSpeed() {
@@ -41,7 +42,9 @@ public class SpeedManager {
         this.onSpeedUpdateListener = onSpeedUpdateListener;
     }
 
-    /** Meters per second to kilometers per hour */
+    /**
+     * Meters per second to kilometers per hour
+     */
     private int mpsToKmh(float ms) {
         return Math.round((ms * 18) / 5);
     }
@@ -59,26 +62,24 @@ public class SpeedManager {
         }
     }
 
-    private LocationListener locationListener = new LocationListener() {
-        public void onLocationChanged(Location location) {
-            if (!location.hasSpeed()) {
-                onSpeedUpdate(SPEED_UNKNOWN, location.getTime());
-            }
-
-            float speedMps = location.getSpeed();
-            onSpeedUpdate(mpsToKmh(speedMps), location.getTime());
+    public void onLocationChanged(Location location) {
+        if (!location.hasSpeed()) {
+            onSpeedUpdate(SPEED_UNKNOWN, location.getTime());
         }
 
-        public void onStatusChanged(String provider, int status, Bundle extras) {
+        float speedMps = location.getSpeed();
+        onSpeedUpdate(mpsToKmh(speedMps), location.getTime());
+    }
 
-        }
+    public void onStatusChanged(String provider, int status, Bundle extras) {
 
-        public void onProviderEnabled(String provider) {
+    }
 
-        }
+    public void onProviderEnabled(String provider) {
 
-        public void onProviderDisabled(String provider) {
+    }
 
-        }
-    };
+    public void onProviderDisabled(String provider) {
+
+    }
 }

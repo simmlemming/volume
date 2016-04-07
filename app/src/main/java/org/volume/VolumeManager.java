@@ -11,6 +11,9 @@ import static android.media.AudioManager.STREAM_MUSIC;
  * Created by mtkachenko on 06/04/16.
  */
 public class VolumeManager {
+    public static final int SECOND_THRESHOLD = 85;
+    public static final int FIRST_THRESHOLD = 60;
+
     public interface OnVolumeChangeListener {
         void onVolumeChange(int oldLevel, int newLevel, int maxLevel);
     }
@@ -27,33 +30,18 @@ public class VolumeManager {
     }
 
     public void onSpeedChange(int oldSpeed, int newSpeed) {
-        if (oldSpeed < newSpeed) {
-            raiseVolumeIfNeeded(oldSpeed, newSpeed);
+        boolean speedRaises = oldSpeed < newSpeed;
+        boolean speedPassesThreshold = passesThreshold(oldSpeed, newSpeed, FIRST_THRESHOLD, SECOND_THRESHOLD);
+
+        if (!speedPassesThreshold) {
+            return;
         }
 
-        if (oldSpeed > newSpeed) {
-            lowerVolumeIfNeeded(oldSpeed, newSpeed);
-        }
+        adjustVolume(speedRaises ? ADJUST_RAISE : ADJUST_LOWER);
     }
 
-    private void lowerVolumeIfNeeded(int oldSpeed, int newSpeed) {
-        if (oldSpeed > 85 && newSpeed < 85) {
-            adjustVolume(ADJUST_LOWER);
-        }
-
-        if (oldSpeed > 60 && newSpeed < 60) {
-            adjustVolume(ADJUST_LOWER);
-        }
-    }
-
-    private void raiseVolumeIfNeeded(int oldSpeed, int newSpeed) {
-        if (oldSpeed < 60 && newSpeed > 60) {
-            adjustVolume(ADJUST_RAISE);
-        }
-
-        if (oldSpeed < 85 && newSpeed > 85) {
-            adjustVolume(ADJUST_RAISE);
-        }
+    public int getCurrentVolume() {
+        return audioManager.getStreamVolume(STREAM_MUSIC);
     }
 
     private void adjustVolume(int direction) {
@@ -62,8 +50,18 @@ public class VolumeManager {
         notifyVolumeChange(oldLevel);
     }
 
-    public int getCurrentVolume() {
-        return audioManager.getStreamVolume(STREAM_MUSIC);
+    private boolean passesThreshold(int oldSpeed, int newSpeed, int... thresholds) {
+        for (int threshold : thresholds) {
+            if (oldSpeed < threshold && threshold < newSpeed) {
+                return true;
+            }
+
+            if (oldSpeed > threshold && threshold > newSpeed) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void notifyVolumeChange(int oldLevel) {
