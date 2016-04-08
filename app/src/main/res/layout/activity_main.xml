@@ -9,13 +9,6 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context="org.volume.MainActivity">
 
-    <View
-        android:id="@+id/vol_change_indicator"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@color/vol_up_indicator"
-        android:visibility="gone" />
-
     <TextView
         android:id="@+id/time"
         android:layout_width="wrap_content"
@@ -34,6 +27,7 @@
         android:textSize="64sp" />
 
     <LinearLayout
+        android:id="@+id/vol_controls"
         android:layout_width="wrap_content"
         android:layout_height="match_parent"
         android:layout_alignParentLeft="true"
@@ -64,4 +58,13 @@
             android:maxHeight="96dp"
             android:text="DOWN" />
     </LinearLayout>
+
+    <CheckBox
+        android:id="@+id/beep_ckeckbox"
+        android:layout_width="120dp"
+        android:layout_height="48dp"
+        android:layout_marginLeft="48dp"
+        android:layout_toRightOf="@id/vol_controls"
+        android:checked="true"
+        android:text="Beep" />
 </RelativeLayout>
