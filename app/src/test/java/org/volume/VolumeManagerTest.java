@@ -13,13 +13,14 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.volume.VolumeManager.FIRST_THRESHOLD;
-import static org.volume.VolumeManager.SECOND_THRESHOLD;
 
 /**
  * Created by mtkachenko on 07/04/16.
  */
 public class VolumeManagerTest {
+    private static final int FIRST_THRESHOLD = VolumeManager.THRESHOLDS[0];
+    private static final int SECOND_THRESHOLD = VolumeManager.THRESHOLDS[1];
+
     private VolumeManager volumeManager;
     private AudioManager audioManager;
     private VolumeManager.OnVolumeChangeListener listener;
@@ -31,7 +32,6 @@ public class VolumeManagerTest {
         volumeManager = new VolumeManager(audioManager);
         volumeManager.setOnVolumeChangeListener(listener);
     }
-
 
     @Test
     public void onSpeedChange_listenerIsCalled() {
