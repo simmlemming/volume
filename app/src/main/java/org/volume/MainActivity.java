@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity implements VolumeManager.OnV
     private ToneGenerator beeper;
 
     private SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
+    private String logFileName;
+
 
     private View.OnClickListener volumeClickListener = new View.OnClickListener() {
         @Override
@@ -73,10 +75,14 @@ public class MainActivity extends AppCompatActivity implements VolumeManager.OnV
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         speedManager = new SpeedManager(locationManager);
 
+        SimpleDateFormat logFileNameFormat = new SimpleDateFormat("'volume'-MM-dd'.log'", Locale.getDefault());
+        logFileName = logFileNameFormat.format(new Date());
+
+        beeper = new ToneGenerator(STREAM_MUSIC, 100);
+
         volumeManager.setOnVolumeChangeListener(this);
         speedManager.setOnSpeedUpdateListener(this);
 
-        beeper = new ToneGenerator(STREAM_MUSIC, 100);
 
         volUpView.setOnClickListener(volumeClickListener);
         volDownView.setOnClickListener(volumeClickListener);
@@ -128,7 +134,7 @@ public class MainActivity extends AppCompatActivity implements VolumeManager.OnV
     }
 
     private void logChange(int oldSpeed, int newSpeed, int volume, long time) {
-        File file = new File(Environment.getExternalStorageDirectory(), "volume.log");
+        File file = new File(Environment.getExternalStorageDirectory(), logFileName);
         try {
             FileOutputStream f = new FileOutputStream(file, true);
             PrintWriter pw = new PrintWriter(f);
