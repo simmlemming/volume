@@ -26,6 +26,14 @@
         android:text="87 km/h"
         android:textSize="64sp" />
 
+    <Button
+        android:id="@+id/stop"
+        android:layout_width="120dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="START" />
+
     <LinearLayout
         android:id="@+id/vol_controls"
         android:layout_width="wrap_content"
@@ -61,10 +69,10 @@
 
     <CheckBox
         android:id="@+id/beep_ckeckbox"
-        android:layout_width="120dp"
+        android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginLeft="48dp"
         android:layout_toRightOf="@id/vol_controls"
         android:checked="true"
-        android:text="Beep" />
+        android:text="Beep on volume change" />
 </RelativeLayout>

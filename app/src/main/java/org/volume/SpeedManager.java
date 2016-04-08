@@ -13,12 +13,17 @@ public class SpeedManager implements LocationListener {
         void onSpeedUpdate(int newSpeed, long time);
 
         void onSpeedChange(int oldSpeed, int newSpeed, long time);
+
+        void onStartListening();
+
+        void onStopListening();
     }
 
     public static final int SPEED_UNKNOWN = -1;
 
     private final LocationManager locationManager;
     private int currentSpeed = SPEED_UNKNOWN;
+    private boolean isListening = false;
 
     public SpeedManager(LocationManager locationManager) {
         this.locationManager = locationManager;
@@ -27,11 +32,33 @@ public class SpeedManager implements LocationListener {
     private OnSpeedUpdateListener onSpeedUpdateListener;
 
     public void startListening() {
+        if (isListening) {
+            return;
+        }
+
+        isListening = true;
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this);
+
+        if (onSpeedUpdateListener != null) {
+            onSpeedUpdateListener.onStartListening();
+        }
     }
 
     public void stopListening() {
+        if (!isListening) {
+            return;
+        }
+
+        isListening = false;
         locationManager.removeUpdates(this);
+
+        if (onSpeedUpdateListener != null) {
+            onSpeedUpdateListener.onStopListening();
+        }
+    }
+
+    public boolean isListening() {
+        return isListening;
     }
 
     public int getCurrentSpeed() {
