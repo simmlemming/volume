@@ -46,6 +46,18 @@ public class VolumeManagerTest {
     }
 
     @Test
+    public void speedIncreasesToThreshold() {
+        volumeManager.onSpeedChange(SECOND_THRESHOLD - 2, SECOND_THRESHOLD);
+        verify(audioManager).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_RAISE), anyInt());
+    }
+
+    @Test
+    public void speedDecreasesFromThreshold() {
+        volumeManager.onSpeedChange(SECOND_THRESHOLD, SECOND_THRESHOLD - 2);
+        verify(audioManager).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_LOWER), anyInt());
+    }
+
+    @Test
     public void speedIncreasesPastFirstThreshold() {
         volumeManager.onSpeedChange(FIRST_THRESHOLD - 2, FIRST_THRESHOLD + 2);
         verify(audioManager).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_RAISE), anyInt());

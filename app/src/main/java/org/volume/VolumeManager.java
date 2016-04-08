@@ -11,7 +11,7 @@ import static android.media.AudioManager.STREAM_MUSIC;
  * Created by mtkachenko on 06/04/16.
  */
 public class VolumeManager {
-    public static int[] THRESHOLDS = {40, 60, 85};
+    public static int[] THRESHOLDS = {20, 85};
 
     public interface OnVolumeChangeListener {
         void onVolumeChange(int oldLevel, int newLevel, int maxLevel);
@@ -51,11 +51,16 @@ public class VolumeManager {
 
     private boolean passesThreshold(int oldSpeed, int newSpeed, int... thresholds) {
         for (int threshold : thresholds) {
-            if (oldSpeed < threshold && threshold <= newSpeed) {
+
+            int os = oldSpeed * 10;
+            int ns = newSpeed * 10;
+            int th = threshold * 10 - 5;
+
+            if (os < th && th < ns) {
                 return true;
             }
 
-            if (oldSpeed > threshold && threshold >= newSpeed) {
+            if (os > th && th > ns) {
                 return true;
             }
         }
