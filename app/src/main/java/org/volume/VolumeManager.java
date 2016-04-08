@@ -29,13 +29,13 @@ public class VolumeManager {
     }
 
     public void onSpeedChange(int oldSpeed, int newSpeed) {
-        boolean speedRaises = oldSpeed < newSpeed;
         boolean speedPassesThreshold = passesThreshold(oldSpeed, newSpeed, THRESHOLDS);
 
         if (!speedPassesThreshold) {
             return;
         }
 
+        boolean speedRaises = oldSpeed < newSpeed;
         adjustVolume(speedRaises ? ADJUST_RAISE : ADJUST_LOWER);
     }
 

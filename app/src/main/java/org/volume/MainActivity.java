@@ -5,11 +5,18 @@ import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Bundle;
+import android.os.Environment;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -115,5 +122,25 @@ public class MainActivity extends AppCompatActivity implements VolumeManager.OnV
     @Override
     public void onSpeedChange(int oldSpeed, int newSpeed, long time) {
         volumeManager.onSpeedChange(oldSpeed, newSpeed);
+
+        int volume = volumeManager.getCurrentVolume();
+        logChange(oldSpeed, newSpeed, volume, time);
+    }
+
+    private void logChange(int oldSpeed, int newSpeed, int volume, long time) {
+        File file = new File(Environment.getExternalStorageDirectory(), "volume.log");
+        try {
+            FileOutputStream f = new FileOutputStream(file, true);
+            PrintWriter pw = new PrintWriter(f);
+            String logRecord = time + "," + oldSpeed + "," + newSpeed + "," + volume;
+            pw.println(logRecord);
+            pw.flush();
+            pw.close();
+            f.close();
+        } catch (FileNotFoundException e) {
+            Toast.makeText(this, "File " + file.getAbsolutePath() + " not found", Toast.LENGTH_SHORT).show();
+        } catch (IOException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 }
