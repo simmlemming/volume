@@ -11,7 +11,10 @@ import android.os.Binder;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.text.TextUtils;
+import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
@@ -20,7 +23,9 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import static android.media.AudioManager.STREAM_MUSIC;
@@ -28,7 +33,7 @@ import static android.media.AudioManager.STREAM_MUSIC;
 /**
  * Created by mtkachenko on 09/04/16.
  */
-public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateListener, VolumeManager.OnVolumeChangeListener {
+public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateListener, VolumeManager.OnVolumeChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
     public interface SpeedServiceListener {
         void onSpeedUpdate(int newSpeed);
         void onVolumeUpdate(int newVolume);
@@ -63,10 +68,12 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         speedManager = new SpeedManager(locationManager);
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        volumeManager = new VolumeManager(audioManager);
+        volumeManager = new VolumeManager(audioManager, getSpeedThresholds());
 
         speedManager.setOnSpeedUpdateListener(this);
         volumeManager.setOnVolumeChangeListener(this);
+
+        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
     }
 
     public void startManagingVolume() {
@@ -86,6 +93,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         speedManager.stopListening();
         speedManager.setOnSpeedUpdateListener(null);
         volumeManager.setOnVolumeChangeListener(null);
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
         super.onDestroy();
     }
 
@@ -102,13 +110,20 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     @Override
     public void onVolumeChange(int oldLevel, int newLevel, int maxLevel) {
-        SharedPreferences preferences = getSharedPreferences(MainActivity.PREFERENCES_NAME, MODE_PRIVATE);
-        if (preferences.getBoolean(MainActivity.PREF_KEY_BEEP, true)) {
+        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if (preferences.getBoolean(getString(R.string.pref_key_beep), true)) {
             boolean volumeIncreased = newLevel > oldLevel;
             beep(volumeIncreased ? TONE_VOLUME_RAISE : TONE_VOLUME_LOWER, 0);
         }
 
         notifyUpdated(Part.VOLUME);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
+        if (key.equals(getString(R.string.pref_key_speed_thresholds))) {
+            volumeManager.setSpeedThresholds(getSpeedThresholds());
+        }
     }
 
     public void setListener(@Nullable SpeedServiceListener listener) {
@@ -175,6 +190,26 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
                 beeper.startTone(tone, 150);
             }
         }, delay);
+    }
+
+    private List<Integer> getSpeedThresholds() {
+        ArrayList<Integer> thresholds = new ArrayList<>();
+
+        String thresholdsFromPrefs = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_key_speed_thresholds), "");
+        if (TextUtils.isEmpty(thresholdsFromPrefs)) {
+            return thresholds;
+        }
+
+        String[] split = thresholdsFromPrefs.split(",");
+        for (String threshold : split) {
+            try {
+                thresholds.add(Integer.parseInt(threshold.trim()));
+            } catch (NumberFormatException e) {
+                Log.e("Volume", "", e);
+            }
+        }
+
+        return thresholds;
     }
 
     private SimpleDateFormat logFileNameFormat = new SimpleDateFormat("'volume'-MM-dd'.log'", Locale.getDefault());

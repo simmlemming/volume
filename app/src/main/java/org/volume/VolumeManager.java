@@ -2,6 +2,9 @@ package org.volume;
 
 import android.media.AudioManager;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static android.media.AudioManager.ADJUST_LOWER;
 import static android.media.AudioManager.ADJUST_RAISE;
 import static android.media.AudioManager.FLAG_PLAY_SOUND;
@@ -11,17 +14,19 @@ import static android.media.AudioManager.STREAM_MUSIC;
  * Created by mtkachenko on 06/04/16.
  */
 public class VolumeManager {
-    public static int[] THRESHOLDS = {20, 85};
-
     public interface OnVolumeChangeListener {
+
         void onVolumeChange(int oldLevel, int newLevel, int maxLevel);
     }
+
+    private List<Integer> speedThresholds = new ArrayList<>();
 
     private AudioManager audioManager;
     private OnVolumeChangeListener onVolumeChangeListener;
 
-    public VolumeManager(AudioManager audioManager) {
+    public VolumeManager(AudioManager audioManager, List<Integer> speedThresholds) {
         this.audioManager = audioManager;
+        setSpeedThresholds(speedThresholds);
     }
 
     public void onManualAdjust(int direction) {
@@ -29,7 +34,7 @@ public class VolumeManager {
     }
 
     public void onSpeedChange(int oldSpeed, int newSpeed) {
-        boolean speedPassesThreshold = passesThreshold(oldSpeed, newSpeed, THRESHOLDS);
+        boolean speedPassesThreshold = passesThreshold(oldSpeed, newSpeed);
 
         if (!speedPassesThreshold) {
             return;
@@ -49,8 +54,16 @@ public class VolumeManager {
         notifyVolumeChange(oldLevel);
     }
 
-    private boolean passesThreshold(int oldSpeed, int newSpeed, int... thresholds) {
-        for (int threshold : thresholds) {
+    public void setSpeedThresholds(List<Integer> speedThresholds) {
+        this.speedThresholds = speedThresholds;
+    }
+
+    public List<Integer> getSpeedThresholds() {
+        return speedThresholds;
+    }
+
+    private boolean passesThreshold(int oldSpeed, int newSpeed) {
+        for (int threshold : speedThresholds) {
 
             int os = oldSpeed * 10;
             int ns = newSpeed * 10;

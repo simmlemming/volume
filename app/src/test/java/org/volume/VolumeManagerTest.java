@@ -9,6 +9,7 @@ import org.junit.Test;
 import static android.media.AudioManager.ADJUST_LOWER;
 import static android.media.AudioManager.ADJUST_RAISE;
 import static android.media.AudioManager.STREAM_MUSIC;
+import static java.util.Arrays.asList;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -18,8 +19,8 @@ import static org.mockito.Mockito.verify;
  * Created by mtkachenko on 07/04/16.
  */
 public class VolumeManagerTest {
-    private static final int FIRST_THRESHOLD = VolumeManager.THRESHOLDS[0];
-    private static final int SECOND_THRESHOLD = VolumeManager.THRESHOLDS[1];
+    private static final int FIRST_THRESHOLD = 20;
+    private static final int SECOND_THRESHOLD = 45;
 
     private VolumeManager volumeManager;
     private AudioManager audioManager;
@@ -29,7 +30,7 @@ public class VolumeManagerTest {
     public void setUp() {
         audioManager = mock(AudioManager.class);
         listener = mock(VolumeManager.OnVolumeChangeListener.class);
-        volumeManager = new VolumeManager(audioManager);
+        volumeManager = new VolumeManager(audioManager, asList(FIRST_THRESHOLD, SECOND_THRESHOLD));
         volumeManager.setOnVolumeChangeListener(listener);
     }
 

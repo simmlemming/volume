@@ -1,0 +1,11 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+    <EditTextPreference
+        android:key="@string/pref_key_speed_thresholds"
+        android:title="Speed thresholds" />
+
+    <CheckBoxPreference
+        android:defaultValue="true"
+        android:key="@string/pref_key_beep"
+        android:title="Beep on volume change" />
+
+</PreferenceScreen>
