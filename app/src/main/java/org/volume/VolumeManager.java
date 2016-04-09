@@ -24,7 +24,7 @@ public class VolumeManager {
         this.audioManager = audioManager;
     }
 
-    public void onManualAdjust(int speed, int direction) {
+    public void onManualAdjust(int direction) {
         adjustVolume(direction);
     }
 
