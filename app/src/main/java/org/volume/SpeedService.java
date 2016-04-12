@@ -1,6 +1,9 @@
 package org.volume;
 
+import android.app.PendingIntent;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -41,6 +44,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     }
 
     private static final String ACTION_STOP_LISTENING = "stop_listening";
+    private static final String ACTION_START_LISTENING = "start_listening";
 
     private enum Part {
         VOLUME,
@@ -92,8 +96,16 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        if (intent == null) {
+            return START_STICKY;
+        }
+
         if (ACTION_STOP_LISTENING.equals(intent.getAction())) {
             stopManagingVolume();
+        }
+
+        if (ACTION_START_LISTENING.equals(intent.getAction())) {
+            startManagingVolume();
         }
 
         return START_STICKY;
@@ -168,6 +180,8 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     }
 
     private void notifyUpdated(Part state) {
+        updateWidget();
+
         if (listener == null) {
             return;
         }
@@ -188,6 +202,13 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
             default:
                 break;
         }
+    }
+
+    private void updateWidget() {
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this);
+        ComponentName componentName = new ComponentName(getPackageName(), VolumeWidgetProvider.class.getName());
+
+        appWidgetManager.updateAppWidget(componentName, VolumeWidgetProvider.getRemoteViews(this, isManagingVolume(), volumeManager.getCurrentVolume()));
     }
 
     public void requestUpdate() {
@@ -245,10 +266,16 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         }
     }
 
-    public static void requestStopListening(Context context) {
-        Intent intent = new Intent(context, SpeedService.class);
-        intent.setAction(ACTION_STOP_LISTENING);
-        context.startService(intent);
+    public static PendingIntent intentToStartManagingVolume(Context context) {
+        Intent speedService = new Intent(context, SpeedService.class);
+        speedService.setAction(ACTION_START_LISTENING);
+        return PendingIntent.getService(context, 0, speedService, PendingIntent.FLAG_CANCEL_CURRENT);
+    }
+
+    public static PendingIntent intentToStopManagingVolume(Context context) {
+        Intent speedService = new Intent(context, SpeedService.class);
+        speedService.setAction(ACTION_STOP_LISTENING);
+        return PendingIntent.getService(context, 0, speedService, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
     @Nullable

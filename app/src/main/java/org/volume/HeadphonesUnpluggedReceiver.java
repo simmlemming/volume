@@ -1,8 +1,10 @@
 package org.volume;
 
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 /**
  * Created by mtkachenko on 12/04/16.
@@ -10,6 +12,10 @@ import android.content.Intent;
 public class HeadphonesUnpluggedReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
-        SpeedService.requestStopListening(context);
+        try {
+            SpeedService.intentToStopManagingVolume(context).send();
+        } catch (PendingIntent.CanceledException e) {
+            Log.e("Volume", "Cannot stop managing volume", e);
+        }
     }
 }

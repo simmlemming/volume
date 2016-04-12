@@ -1,6 +1,8 @@
 package org.volume;
 
+import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.SharedPreferences;
@@ -190,5 +192,10 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
     private void updateSpeedThresholdsView() {
         String thresholds = String.valueOf(speedService.getVolumeManager().getSpeedThresholds());
         speedThresholdsView.setText(thresholds);
+    }
+
+    public static PendingIntent intentToOpen(Context context) {
+        Intent activity = new Intent(context, MainActivity.class);
+        return PendingIntent.getActivity(context, 0, activity, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }
