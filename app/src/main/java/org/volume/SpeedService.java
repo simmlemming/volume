@@ -40,6 +40,8 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         void onStateUpdate(boolean isListening);
     }
 
+    private static final String ACTION_STOP_LISTENING = "stop_listening";
+
     private enum Part {
         VOLUME,
         SPEED,
@@ -86,6 +88,15 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     public boolean isManagingVolume() {
         return speedManager.isListening();
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        if (ACTION_STOP_LISTENING.equals(intent.getAction())) {
+            stopManagingVolume();
+        }
+
+        return START_STICKY;
     }
 
     @Override
@@ -230,6 +241,12 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         } catch (IOException e) {
             Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public static void requestStopListening(Context context) {
+        Intent intent = new Intent(context, SpeedService.class);
+        intent.setAction(ACTION_STOP_LISTENING);
+        context.startService(intent);
     }
 
     @Nullable
