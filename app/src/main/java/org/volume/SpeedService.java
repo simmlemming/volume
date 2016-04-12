@@ -153,8 +153,10 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     public void onStartListening() {
         beep(TONE_VOLUME_LOWER, 0);
         beep(TONE_VOLUME_RAISE, 300);
-
         notifyUpdated(Part.STATE);
+
+        volumeManager.setVolumePct(0.6666666f);
+        notifyUpdated(Part.VOLUME);
     }
 
     @Override

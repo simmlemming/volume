@@ -58,6 +58,21 @@ public class VolumeManager {
         this.speedThresholds = speedThresholds;
     }
 
+    public void setVolumePct(float pct) {
+        if (pct > 1) {
+            pct = 1;
+        }
+
+        if (pct < 0) {
+            pct = 0;
+        }
+
+        int maxVolume = audioManager.getStreamMaxVolume(STREAM_MUSIC);
+        int newVolume = Math.round(maxVolume * pct);
+
+        audioManager.setStreamVolume(STREAM_MUSIC, newVolume, 0);
+    }
+
     public List<Integer> getSpeedThresholds() {
         return speedThresholds;
     }
