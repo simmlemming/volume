@@ -68,7 +68,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     public void onCreate() {
         super.onCreate();
 
-        beeper = new ToneGenerator(STREAM_MUSIC, 100);
+        beeper = new ToneGenerator(STREAM_MUSIC, 75);
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         speedManager = new SpeedManager(locationManager);
