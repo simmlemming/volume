@@ -34,9 +34,8 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
             speedService = ((SpeedService.LocalBinder)binder).getService();
 
             speedService.setListener(MainActivity.this);
-            speedService.startManagingVolume();
-
             speedService.requestUpdate();
+
             updateSpeedThresholdsView();
         }
 
