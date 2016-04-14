@@ -13,19 +13,32 @@
         android:id="@+id/speed_thresholds"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
         android:text="20,45,85"
         android:textSize="18sp" />
 
-    <TextView
-        android:id="@+id/speed"
+    <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerInParent="true"
-        android:text="87 km/h"
-        android:textSize="64sp" />
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/speed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="87 km/h"
+            android:textSize="64sp" />
+
+        <TextView
+            android:id="@+id/noise"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="8763"
+            android:textSize="64sp" />
+    </LinearLayout>
 
     <Button
         android:id="@+id/stop"

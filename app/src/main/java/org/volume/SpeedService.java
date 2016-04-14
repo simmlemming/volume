@@ -57,6 +57,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     private SpeedManager speedManager;
     private VolumeManager volumeManager;
+    private NoiseManager noiseManager;
 
     private Handler handler = new Handler();
     private ToneGenerator beeper;
@@ -76,6 +77,8 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         volumeManager = new VolumeManager(audioManager, getSpeedThresholds());
 
+        noiseManager = new NoiseManager();
+
         speedManager.setOnSpeedUpdateListener(this);
         volumeManager.setOnVolumeChangeListener(this);
 
@@ -84,10 +87,12 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     public void startManagingVolume() {
         speedManager.startListening();
+        noiseManager.start();
     }
 
     public void stopManagingVolume() {
         speedManager.stopListening();
+        noiseManager.stop();
     }
 
     public boolean isManagingVolume() {
@@ -159,6 +164,10 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     public VolumeManager getVolumeManager() {
         return volumeManager;
+    }
+
+    public NoiseManager getNoiseManager() {
+        return noiseManager;
     }
 
     @Override
@@ -254,7 +263,12 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         try {
             FileOutputStream f = new FileOutputStream(file, true);
             PrintWriter pw = new PrintWriter(f);
-            String logRecord = time + "," + oldSpeed + "," + newSpeed + "," + volume;
+            String logRecord = time + "," +
+                                oldSpeed + "," +
+                                newSpeed + "," +
+                                volume + "," +
+                                noiseManager.getCurrentNoiseLevel() + "," +
+                                noiseManager.getCurrentNoiseLevelDb();
             pw.println(logRecord);
             pw.flush();
             pw.close();

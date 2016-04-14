@@ -22,7 +22,7 @@ import static android.media.AudioManager.ADJUST_LOWER;
 import static android.media.AudioManager.ADJUST_RAISE;
 
 public class MainActivity extends AppCompatActivity implements SpeedService.SpeedServiceListener, SharedPreferences.OnSharedPreferenceChangeListener {
-    private TextView speedView, volLevelView, speedThresholdsView;
+    private TextView speedView, noiseView, volLevelView, speedThresholdsView;
     private CheckBox beepView;
     private Button startStopView;
 
@@ -103,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
         setContentView(R.layout.activity_main);
 
         speedView = (TextView) findViewById(R.id.speed);
+        noiseView = (TextView) findViewById(R.id.noise);
         speedThresholdsView = (TextView) findViewById(R.id.speed_thresholds);
         volLevelView = (TextView) findViewById(R.id.vol_level);
         startStopView = (Button) findViewById(R.id.stop);
@@ -151,8 +152,12 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
     public void onSpeedUpdate(int newSpeed) {
         if (newSpeed == SpeedManager.SPEED_UNKNOWN) {
             speedView.setText("- km/h");
+            noiseView.setText("-");
         } else {
             speedView.setText(newSpeed + " km/h");
+            int noise = speedService.getNoiseManager().getCurrentNoiseLevel();
+            long noiseDb = speedService.getNoiseManager().getCurrentNoiseLevelDb();
+            noiseView.setText(noise + " [" + noiseDb + " dB]");
         }
     }
 
@@ -164,6 +169,10 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
     @Override
     public void onStateUpdate(boolean isListening) {
         startStopView.setText(isListening ? "STOP" : "START");
+        if (!isListening) {
+            speedView.setText("- km/h");
+            noiseView.setText("-");
+        }
     }
 
     @Override
