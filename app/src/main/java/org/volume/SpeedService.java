@@ -27,9 +27,11 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import static android.media.AudioManager.STREAM_MUSIC;
 
@@ -62,6 +64,10 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     private Handler handler = new Handler();
     private ToneGenerator beeper;
 
+    private static final String DEFAULT_LOGFILE_NAME = "volume-should_never_be_used.log";
+    private static final SimpleDateFormat logFileNameFormat = new SimpleDateFormat("'volume'-MM-dd-HH-mm'.log'", Locale.getDefault());
+    private String logFileName = DEFAULT_LOGFILE_NAME;
+
     @Nullable
     private SpeedServiceListener listener;
 
@@ -86,6 +92,9 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     }
 
     public void startManagingVolume() {
+        Date currentTime = Calendar.getInstance(TimeZone.getDefault()).getTime();
+        logFileName = logFileNameFormat.format(currentTime);
+
         speedManager.startListening();
         noiseManager.start();
     }
@@ -93,6 +102,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     public void stopManagingVolume() {
         speedManager.stopListening();
         noiseManager.stop();
+        logFileName = DEFAULT_LOGFILE_NAME;
     }
 
     public boolean isManagingVolume() {
@@ -133,7 +143,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     @Override
     public void onSpeedChange(int oldSpeed, int newSpeed, long time) {
         volumeManager.onSpeedChange(oldSpeed, newSpeed);
-        logChange(oldSpeed, newSpeed, volumeManager.getCurrentVolume(), time);
+        logSpeedChange(oldSpeed, newSpeed, volumeManager.getCurrentVolume(), time);
     }
 
     @Override
@@ -255,10 +265,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         return thresholds;
     }
 
-    private SimpleDateFormat logFileNameFormat = new SimpleDateFormat("'volume'-MM-dd'.log'", Locale.getDefault());
-    private void logChange(int oldSpeed, int newSpeed, int volume, long time) {
-        String logFileName = logFileNameFormat.format(new Date());
-
+    private void logSpeedChange(int oldSpeed, int newSpeed, int volume, long time) {
         File file = new File(Environment.getExternalStorageDirectory(), logFileName);
         try {
             FileOutputStream f = new FileOutputStream(file, true);
