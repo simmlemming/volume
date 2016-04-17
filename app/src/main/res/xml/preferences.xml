@@ -8,4 +8,8 @@
         android:key="@string/pref_key_beep"
         android:title="Beep on volume change" />
 
+    <ListPreference
+        android:key="@string/pref_key_bt_device"
+        android:title="Start when this bluetooth device connects" />
+
 </PreferenceScreen>
