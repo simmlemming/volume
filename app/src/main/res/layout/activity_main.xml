@@ -7,7 +7,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context="org.volume.MainActivity">
+    tools:context="org.volume.activity.MainActivity">
 
     <CheckBox
         android:id="@+id/beep_ckeckbox"
@@ -16,7 +16,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:checked="true"
-        android:text="Beep on volume change" />
+        android:text="@string/beep_setting" />
 
     <Button
         android:id="@+id/stop"
@@ -24,7 +24,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/beep_ckeckbox"
-        android:text="START" />
+        android:text="@string/start" />
 
     <TextView
         android:id="@+id/speed_thresholds"
@@ -33,8 +33,8 @@
         android:layout_alignBaseline="@id/stop"
         android:layout_marginLeft="16dp"
         android:layout_toRightOf="@id/stop"
-        android:text="20,45,85"
-        android:textSize="18sp" />
+        android:textSize="18sp"
+        tools:text="20,45,85" />
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -47,14 +47,14 @@
             android:id="@+id/speed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="87 km/h"
-            android:textSize="64sp" />
+            android:textSize="64sp"
+            tools:text="87 km/h" />
 
         <TextView
             android:id="@+id/noise"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="8763 Db"
+            android:text="8763 [-12 dB]"
             android:textSize="64sp" />
     </LinearLayout>
 
@@ -72,15 +72,16 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:maxHeight="96dp"
-            android:text="UP" />
+            android:text="@string/volume_up"
+            android:textSize="24sp" />
 
         <TextView
             android:id="@+id/vol_level"
             android:layout_width="96dp"
             android:layout_height="96dp"
             android:gravity="center"
-            android:text="14"
-            android:textSize="48sp" />
+            android:textSize="48sp"
+            tools:text="14" />
 
         <Button
             android:id="@+id/vol_down"
@@ -88,7 +89,8 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:maxHeight="96dp"
-            android:text="DOWN" />
+            android:text="@string/volume_down"
+            android:textSize="24sp" />
     </LinearLayout>
 
 </RelativeLayout>

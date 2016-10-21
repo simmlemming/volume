@@ -1,4 +1,4 @@
-package org.volume;
+package org.volume.activity;
 
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -17,6 +17,11 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
+
+import org.volume.R;
+import org.volume.manager.SpeedManager;
+import org.volume.service.SpeedService;
+import org.volume.manager.VolumeManager;
 
 import static android.media.AudioManager.ADJUST_LOWER;
 import static android.media.AudioManager.ADJUST_RAISE;
@@ -151,13 +156,13 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
     @Override
     public void onSpeedUpdate(int newSpeed) {
         if (newSpeed == SpeedManager.SPEED_UNKNOWN) {
-            speedView.setText("- km/h");
-            noiseView.setText("-");
+            speedView.setText(getString(R.string.speed_unknown));
+            noiseView.setText(getString(R.string.noise_level_unknown));
         } else {
-            speedView.setText(newSpeed + " km/h");
-            int noise = speedService.getNoiseManager().getCurrentNoiseLevel();
+            speedView.setText(getString(R.string.speed, newSpeed));
+            int noiseRaw = speedService.getNoiseManager().getCurrentNoiseLevel();
             long noiseDb = speedService.getNoiseManager().getCurrentNoiseLevelDb();
-            noiseView.setText(noise + " [" + noiseDb + " dB]");
+            noiseView.setText(getString(R.string.noise, noiseRaw, noiseDb));
         }
     }
 
@@ -168,10 +173,11 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
 
     @Override
     public void onStateUpdate(boolean isListening) {
-        startStopView.setText(isListening ? "STOP" : "START");
+        startStopView.setText(isListening ? getString(R.string.stop) : getString(R.string.start));
+
         if (!isListening) {
-            speedView.setText("- km/h");
-            noiseView.setText("-");
+            speedView.setText(getString(R.string.speed_unknown));
+            noiseView.setText(getString(R.string.noise_level_unknown));
         }
     }
 

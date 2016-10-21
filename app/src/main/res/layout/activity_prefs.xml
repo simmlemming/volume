@@ -5,7 +5,7 @@
 
     <fragment
         android:id="@+id/prefs_fragment"
-        android:name="org.volume.PrefsFragment"
+        android:name="org.volume.fragment.PrefsFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </FrameLayout>

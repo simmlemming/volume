@@ -1,10 +1,12 @@
-package org.volume;
+package org.volume.receiver;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+
+import org.volume.service.SpeedService;
 
 /**
  * Created by mtkachenko on 12/04/16.

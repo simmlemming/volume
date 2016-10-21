@@ -1,6 +1,8 @@
-package org.volume;
+package org.volume.manager;
 
 import android.media.AudioManager;
+
+import org.volume.util.MathUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,12 +17,10 @@ import static android.media.AudioManager.STREAM_MUSIC;
  */
 public class VolumeManager {
     public interface OnVolumeChangeListener {
-
         void onVolumeChange(int oldLevel, int newLevel, int maxLevel);
     }
 
     private List<Integer> speedThresholds = new ArrayList<>();
-
     private AudioManager audioManager;
     private OnVolumeChangeListener onVolumeChangeListener;
 
@@ -34,7 +34,7 @@ public class VolumeManager {
     }
 
     public void onSpeedChange(int oldSpeed, int newSpeed) {
-        boolean speedPassesThreshold = passesThreshold(oldSpeed, newSpeed);
+        boolean speedPassesThreshold = MathUtils.speedPassesThreshold(oldSpeed, newSpeed, speedThresholds);
 
         if (!speedPassesThreshold) {
             return;
@@ -59,13 +59,7 @@ public class VolumeManager {
     }
 
     public void setVolumePct(float pct) {
-        if (pct > 1) {
-            pct = 1;
-        }
-
-        if (pct < 0) {
-            pct = 0;
-        }
+        pct = MathUtils.betweenZeroAndOne(pct);
 
         int maxVolume = audioManager.getStreamMaxVolume(STREAM_MUSIC);
         int newVolume = Math.round(maxVolume * pct);
@@ -75,25 +69,6 @@ public class VolumeManager {
 
     public List<Integer> getSpeedThresholds() {
         return speedThresholds;
-    }
-
-    private boolean passesThreshold(int oldSpeed, int newSpeed) {
-        for (int threshold : speedThresholds) {
-
-            int os = oldSpeed * 10;
-            int ns = newSpeed * 10;
-            int th = threshold * 10 - 5;
-
-            if (os < th && th < ns) {
-                return true;
-            }
-
-            if (os > th && th > ns) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     private void notifyVolumeChange(int oldLevel) {

@@ -1,8 +1,10 @@
-package org.volume;
+package org.volume.manager;
 
 import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
+
+import org.volume.util.MathUtils;
 
 /**
  * Created by mtkachenko on 14/04/16.
@@ -29,16 +31,12 @@ public class NoiseManager {
         noiseMeter = null;
     }
 
-    public boolean isStarted() {
-        return noiseMeter != null;
-    }
-
     public int getCurrentNoiseLevel() {
         return currentNoiseLevel;
     }
 
     public long getCurrentNoiseLevelDb() {
-        return rawToDb(currentNoiseLevel);
+        return MathUtils.rawNoiseLevelToDb(currentNoiseLevel);
     }
 
     private class NoiseMeter extends Thread {
@@ -52,34 +50,11 @@ public class NoiseManager {
             record.startRecording();
 
             while (!interrupted()) {
-                int read = record.read(buffer, 0, minSize);
-                currentNoiseLevel = maxAbs(buffer);
-//                Log.i("Volume", read + " : " + currentNoiseLevel + " : " + rawToDb(currentNoiseLevel));
+                currentNoiseLevel = MathUtils.maxAbs(buffer);
             }
 
             record.stop();
             currentNoiseLevel = 0;
         }
-
-        private int maxAbs(short... array) {
-            if (array.length == 0) {
-                return 0;
-            }
-
-            int max = Math.abs(array[0]);
-
-            for (int i = 1; i < array.length; i++) {
-                int absI = Math.abs(array[i]);
-                if (absI > max) {
-                    max = absI;
-                }
-            }
-
-            return max;
-        }
-    }
-
-    public static long rawToDb(int raw) {
-        return Math.round(20 * Math.log10(raw / 32768.0));
     }
 }

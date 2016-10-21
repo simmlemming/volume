@@ -1,14 +1,18 @@
-package org.volume;
+package org.volume.manager;
 
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
+import org.volume.util.MathUtils;
+
 /**
  * Created by mtkachenko on 06/04/16.
  */
 public class SpeedManager implements LocationListener {
+    private static final int LOCATION_UPDATES_INTERVAL_MS = 2000;
+
     public interface OnSpeedUpdateListener {
         void onSpeedUpdate(int newSpeed, long time);
 
@@ -37,7 +41,7 @@ public class SpeedManager implements LocationListener {
         }
 
         isListening = true;
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 2000, 0, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_UPDATES_INTERVAL_MS, 0, this);
 
         if (onSpeedUpdateListener != null) {
             onSpeedUpdateListener.onStartListening();
@@ -69,13 +73,6 @@ public class SpeedManager implements LocationListener {
         this.onSpeedUpdateListener = onSpeedUpdateListener;
     }
 
-    /**
-     * Meters per second to kilometers per hour
-     */
-    private int mpsToKmh(float ms) {
-        return Math.round((ms * 18) / 5);
-    }
-
     private void onSpeedUpdate(int newSpeed, long time) {
         int oldSpeed = currentSpeed;
         currentSpeed = newSpeed;
@@ -95,7 +92,7 @@ public class SpeedManager implements LocationListener {
         }
 
         float speedMps = location.getSpeed();
-        onSpeedUpdate(mpsToKmh(speedMps), location.getTime());
+        onSpeedUpdate(MathUtils.mpsToKmh(speedMps), location.getTime());
     }
 
     public void onStatusChanged(String provider, int status, Bundle extras) {

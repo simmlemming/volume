@@ -4,4 +4,23 @@
     <string name="pref_key_beep">beep</string>
     <string name="pref_key_speed_thresholds">speed_thresholds</string>
     <string name="pref_key_bt_device">device</string>
+
+    <string name="beep_setting">Beep on volume change</string>
+    <string name="speed_thresholds_setting">Speed thresholds</string>
+    <string name="start_when_bt_setting">Start when this bluetooth device connects</string>
+
+    <string name="speed_unknown">- km/h</string>
+    <string name="speed">%d km/h</string>
+
+    <string name="noise_level_unknown">-</string>
+    <string name="noise">%1$d [%2$d dB]</string>
+
+    <string name="start">start</string>
+    <string name="stop">stop</string>
+
+    <string name="on">on</string>
+    <string name="off">off</string>
+
+    <string name="volume_up">+</string>
+    <string name="volume_down">-</string>
 </resources>

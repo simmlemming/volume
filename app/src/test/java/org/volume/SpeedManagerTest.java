@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
+import org.volume.manager.SpeedManager;
 
 import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.eq;
@@ -15,7 +16,7 @@ import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.volume.SpeedManager.SPEED_UNKNOWN;
+import static org.volume.manager.SpeedManager.SPEED_UNKNOWN;
 
 /**
  * Created by mtkachenko on 07/04/16.

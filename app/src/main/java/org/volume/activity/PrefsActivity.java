@@ -1,8 +1,10 @@
-package org.volume;
+package org.volume.activity;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+
+import org.volume.R;
 
 /**
  * Created by mtkachenko on 09/04/16.

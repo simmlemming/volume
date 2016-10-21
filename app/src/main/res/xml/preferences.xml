@@ -1,15 +1,15 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
     <EditTextPreference
         android:key="@string/pref_key_speed_thresholds"
-        android:title="Speed thresholds" />
+        android:title="@string/speed_thresholds_setting" />
 
     <CheckBoxPreference
         android:defaultValue="true"
         android:key="@string/pref_key_beep"
-        android:title="Beep on volume change" />
+        android:title="@string/beep_setting" />
 
     <ListPreference
         android:key="@string/pref_key_bt_device"
-        android:title="Start when this bluetooth device connects" />
+        android:title="@string/start_when_bt_setting" />
 
 </PreferenceScreen>

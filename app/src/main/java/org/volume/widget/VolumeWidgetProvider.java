@@ -1,4 +1,4 @@
-package org.volume;
+package org.volume.widget;
 
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -6,8 +6,11 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.widget.RemoteViews;
 
-import static org.volume.SpeedService.intentToStartManagingVolume;
-import static org.volume.SpeedService.intentToStopManagingVolume;
+import org.volume.activity.MainActivity;
+import org.volume.R;
+
+import static org.volume.service.SpeedService.intentToStartManagingVolume;
+import static org.volume.service.SpeedService.intentToStopManagingVolume;
 
 /**
  * Created by mtkachenko on 12/04/16.
@@ -26,7 +29,7 @@ public class VolumeWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
 
         views.setOnClickPendingIntent(R.id.start_stop, isActive ? intentToStopManagingVolume(context) : intentToStartManagingVolume(context));
-        views.setTextViewText(R.id.start_stop, isActive ? "OFF" : "ON");
+        views.setTextViewText(R.id.start_stop, isActive ? context.getString(R.string.off) : context.getString(R.string.on));
 
         int textColor = isActive ? R.color.text_state_active : R.color.text_state_passive;
         views.setTextColor(R.id.level, context.getResources().getColor(textColor));

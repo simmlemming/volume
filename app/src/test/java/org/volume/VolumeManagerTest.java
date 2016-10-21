@@ -5,6 +5,7 @@ import android.media.AudioManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.volume.manager.VolumeManager;
 
 import static android.media.AudioManager.ADJUST_LOWER;
 import static android.media.AudioManager.ADJUST_RAISE;

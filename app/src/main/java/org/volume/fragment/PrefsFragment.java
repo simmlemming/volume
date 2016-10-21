@@ -1,4 +1,4 @@
-package org.volume;
+package org.volume.fragment;
 
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -11,6 +11,8 @@ import android.preference.PreferenceFragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+
+import org.volume.R;
 
 import java.util.ArrayList;
 import java.util.List;

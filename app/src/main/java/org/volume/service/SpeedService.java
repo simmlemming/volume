@@ -1,4 +1,4 @@
-package org.volume;
+package org.volume.service;
 
 import android.app.PendingIntent;
 import android.app.Service;
@@ -11,27 +11,22 @@ import android.location.LocationManager;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Binder;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
+import org.volume.R;
+import org.volume.manager.NoiseManager;
+import org.volume.manager.SpeedManager;
+import org.volume.manager.VolumeManager;
+import org.volume.util.LogUtils;
+import org.volume.widget.VolumeWidgetProvider;
+
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
 
 import static android.media.AudioManager.STREAM_MUSIC;
 
@@ -63,10 +58,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     private Handler handler = new Handler();
     private ToneGenerator beeper;
-
-    private static final String DEFAULT_LOGFILE_NAME = "volume-should_never_be_used.log";
-    private static final SimpleDateFormat logFileNameFormat = new SimpleDateFormat("'volume'-MM-dd-HH-mm'.log'", Locale.getDefault());
-    private String logFileName = DEFAULT_LOGFILE_NAME;
+    private LogUtils log;
 
     @Nullable
     private SpeedServiceListener listener;
@@ -75,6 +67,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     public void onCreate() {
         super.onCreate();
 
+        log = new LogUtils();
         beeper = new ToneGenerator(STREAM_MUSIC, 75);
 
         LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
@@ -92,9 +85,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     }
 
     public void startManagingVolume() {
-        Date currentTime = Calendar.getInstance(TimeZone.getDefault()).getTime();
-        logFileName = logFileNameFormat.format(currentTime);
-
+        log.startSession();
         speedManager.startListening();
         noiseManager.start();
     }
@@ -102,7 +93,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     public void stopManagingVolume() {
         speedManager.stopListening();
         noiseManager.stop();
-        logFileName = DEFAULT_LOGFILE_NAME;
+        log.stopSession();
     }
 
     public boolean isManagingVolume() {
@@ -143,7 +134,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     @Override
     public void onSpeedChange(int oldSpeed, int newSpeed, long time) {
         volumeManager.onSpeedChange(oldSpeed, newSpeed);
-        logSpeedChange(oldSpeed, newSpeed, volumeManager.getCurrentVolume(), time);
+        log.logSpeedChange(oldSpeed, newSpeed, volumeManager.getCurrentVolume(), noiseManager.getCurrentNoiseLevel(), time);
     }
 
     @Override
@@ -263,28 +254,6 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         }
 
         return thresholds;
-    }
-
-    private void logSpeedChange(int oldSpeed, int newSpeed, int volume, long time) {
-        File file = new File(Environment.getExternalStorageDirectory(), logFileName);
-        try {
-            FileOutputStream f = new FileOutputStream(file, true);
-            PrintWriter pw = new PrintWriter(f);
-            String logRecord = time + "," +
-                                oldSpeed + "," +
-                                newSpeed + "," +
-                                volume + "," +
-                                noiseManager.getCurrentNoiseLevel() + "," +
-                                noiseManager.getCurrentNoiseLevelDb();
-            pw.println(logRecord);
-            pw.flush();
-            pw.close();
-            f.close();
-        } catch (FileNotFoundException e) {
-            Toast.makeText(this, "File " + file.getAbsolutePath() + " not found", Toast.LENGTH_SHORT).show();
-        } catch (IOException e) {
-            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
     }
 
     public static PendingIntent intentToStartManagingVolume(Context context) {
