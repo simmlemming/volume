@@ -7,26 +7,23 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.LocationManager;
-import android.media.AudioManager;
 import android.media.ToneGenerator;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
-import android.text.TextUtils;
-import android.util.Log;
 
+import org.volume.Preferences;
 import org.volume.R;
+import org.volume.VolumeApplication;
 import org.volume.manager.NoiseManager;
 import org.volume.manager.SpeedManager;
 import org.volume.manager.VolumeManager;
 import org.volume.util.LogUtils;
 import org.volume.widget.VolumeWidgetProvider;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.inject.Inject;
 
 import static android.media.AudioManager.STREAM_MUSIC;
 
@@ -52,13 +49,14 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     private static final int TONE_VOLUME_RAISE = ToneGenerator.TONE_DTMF_B;
     private static final int TONE_VOLUME_LOWER = ToneGenerator.TONE_DTMF_1;
 
-    private SpeedManager speedManager;
-    private VolumeManager volumeManager;
-    private NoiseManager noiseManager;
+    @Inject SpeedManager speedManager;
+    @Inject Preferences preferences;
+    @Inject VolumeManager volumeManager;
+    @Inject NoiseManager noiseManager;
+    @Inject LogUtils log;
 
     private Handler handler = new Handler();
     private ToneGenerator beeper;
-    private LogUtils log;
 
     @Nullable
     private SpeedServiceListener listener;
@@ -67,16 +65,19 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     public void onCreate() {
         super.onCreate();
 
-        log = new LogUtils();
         beeper = new ToneGenerator(STREAM_MUSIC, 75);
 
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        speedManager = new SpeedManager(locationManager);
+        getVolumeApplicationContext().getSpeedManagerComponent().inject(this);
 
-        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        volumeManager = new VolumeManager(audioManager, getSpeedThresholds());
+//        log = new LogUtils();
 
-        noiseManager = new NoiseManager();
+//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        speedManager = new SpeedManager(locationManager);
+
+//        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+//        volumeManager = new VolumeManager(audioManager, preferences);
+
+//        noiseManager = new NoiseManager();
 
         speedManager.setOnSpeedUpdateListener(this);
         volumeManager.setOnVolumeChangeListener(this);
@@ -151,7 +152,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.pref_key_speed_thresholds))) {
-            volumeManager.setSpeedThresholds(getSpeedThresholds());
+            volumeManager.setSpeedThresholds(preferences.getSpeedThresholds());
         }
     }
 
@@ -236,24 +237,8 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         }, delay);
     }
 
-    private List<Integer> getSpeedThresholds() {
-        ArrayList<Integer> thresholds = new ArrayList<>();
-
-        String thresholdsFromPrefs = PreferenceManager.getDefaultSharedPreferences(this).getString(getString(R.string.pref_key_speed_thresholds), "");
-        if (TextUtils.isEmpty(thresholdsFromPrefs)) {
-            return thresholds;
-        }
-
-        String[] split = thresholdsFromPrefs.split(",");
-        for (String threshold : split) {
-            try {
-                thresholds.add(Integer.parseInt(threshold.trim()));
-            } catch (NumberFormatException e) {
-                Log.e("Volume", "", e);
-            }
-        }
-
-        return thresholds;
+    private VolumeApplication getVolumeApplicationContext() {
+        return (VolumeApplication) getApplicationContext();
     }
 
     public static PendingIntent intentToStartManagingVolume(Context context) {

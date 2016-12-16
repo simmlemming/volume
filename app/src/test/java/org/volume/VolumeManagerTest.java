@@ -15,6 +15,7 @@ import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by mtkachenko on 07/04/16.
@@ -25,13 +26,18 @@ public class VolumeManagerTest {
 
     private VolumeManager volumeManager;
     private AudioManager audioManager;
+    private Preferences preferences;
     private VolumeManager.OnVolumeChangeListener listener;
 
     @Before
     public void setUp() {
         audioManager = mock(AudioManager.class);
         listener = mock(VolumeManager.OnVolumeChangeListener.class);
-        volumeManager = new VolumeManager(audioManager, asList(FIRST_THRESHOLD, SECOND_THRESHOLD));
+        preferences = mock(Preferences.class);
+        when(preferences.getSpeedThresholds())
+                .thenReturn(asList(FIRST_THRESHOLD, SECOND_THRESHOLD));
+
+        volumeManager = new VolumeManager(audioManager, preferences);
         volumeManager.setOnVolumeChangeListener(listener);
     }
 

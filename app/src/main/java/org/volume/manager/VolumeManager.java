@@ -2,6 +2,7 @@ package org.volume.manager;
 
 import android.media.AudioManager;
 
+import org.volume.Preferences;
 import org.volume.util.MathUtils;
 
 import java.util.ArrayList;
@@ -24,9 +25,9 @@ public class VolumeManager {
     private AudioManager audioManager;
     private OnVolumeChangeListener onVolumeChangeListener;
 
-    public VolumeManager(AudioManager audioManager, List<Integer> speedThresholds) {
+    public VolumeManager(AudioManager audioManager, Preferences preferences) {
         this.audioManager = audioManager;
-        setSpeedThresholds(speedThresholds);
+        setSpeedThresholds(preferences.getSpeedThresholds());
     }
 
     public void onManualAdjust(int direction) {
