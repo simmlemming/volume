@@ -50,6 +50,7 @@ public class NoiseManager {
             record.startRecording();
 
             while (!interrupted()) {
+                record.read(buffer, 0, minSize);
                 currentNoiseLevel = MathUtils.maxAbs(buffer);
             }
 
