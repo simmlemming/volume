@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import org.volume.R;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -61,7 +62,9 @@ public class PrefsFragment extends PreferenceFragment implements SharedPreferenc
         List<String> entryValues = new ArrayList<>();
 
         BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();
-        Set<BluetoothDevice> devices = bluetooth.getBondedDevices();
+        Set<BluetoothDevice> devices = bluetooth == null
+            ? Collections.<BluetoothDevice>emptySet()
+            : bluetooth.getBondedDevices();
 
         if (devices.isEmpty()) {
             preference.setEnabled(false);
