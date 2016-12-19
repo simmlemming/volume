@@ -7,7 +7,7 @@
     <string name="pref_key_bt_device">device</string>
 
     <string name="beep_setting">Beep on volume change</string>
-    <string name="log_setting">Write speed changes file</string>
+    <string name="log_setting">Write speed changes to file</string>
     <string name="speed_thresholds_setting">Speed thresholds</string>
     <string name="start_when_bt_setting">Start when this bluetooth device connects</string>
 
