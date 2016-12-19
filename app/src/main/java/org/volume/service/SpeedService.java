@@ -7,9 +7,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.media.ToneGenerator;
 import android.os.Binder;
-import android.os.Handler;
 import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -20,12 +18,11 @@ import org.volume.VolumeApplication;
 import org.volume.manager.NoiseManager;
 import org.volume.manager.SpeedManager;
 import org.volume.manager.VolumeManager;
+import org.volume.util.Beeper;
 import org.volume.util.SpeedLogger;
 import org.volume.widget.VolumeWidgetProvider;
 
 import javax.inject.Inject;
-
-import static android.media.AudioManager.STREAM_MUSIC;
 
 /**
  * Created by mtkachenko on 09/04/16.
@@ -46,17 +43,12 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         STATE
     }
 
-    private static final int TONE_VOLUME_RAISE = ToneGenerator.TONE_DTMF_B;
-    private static final int TONE_VOLUME_LOWER = ToneGenerator.TONE_DTMF_1;
-
     @Inject SpeedManager speedManager;
     @Inject Preferences preferences;
     @Inject VolumeManager volumeManager;
     @Inject NoiseManager noiseManager;
     @Inject SpeedLogger speedLogger;
-
-    private Handler handler = new Handler();
-    private ToneGenerator beeper;
+    @Inject Beeper beeper;
 
     @Nullable
     private SpeedServiceListener listener;
@@ -64,8 +56,6 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     @Override
     public void onCreate() {
         super.onCreate();
-
-        beeper = new ToneGenerator(STREAM_MUSIC, 75);
 
         getVolumeApplicationContext().getSpeedManagerComponent().inject(this);
 
@@ -135,7 +125,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
         if (preferences.getBoolean(getString(R.string.pref_key_beep), true)) {
             boolean volumeIncreased = newLevel > oldLevel;
-            beep(volumeIncreased ? TONE_VOLUME_RAISE : TONE_VOLUME_LOWER, 0);
+            beeper.beepVolumeChangeTone(volumeIncreased);
         }
 
         notifyUpdated(Part.VOLUME);
@@ -171,8 +161,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     @Override
     public void onStartListening() {
-        beep(TONE_VOLUME_LOWER, 0);
-        beep(TONE_VOLUME_RAISE, 300);
+        beeper.beepStartTone();
         notifyUpdated(Part.STATE);
 
         volumeManager.setVolumePct(0.6666666f);
@@ -181,9 +170,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     @Override
     public void onStopListening() {
-        beep(TONE_VOLUME_RAISE, 0);
-        beep(TONE_VOLUME_LOWER, 300);
-
+        beeper.beepStopTone();
         notifyUpdated(Part.STATE);
     }
 
@@ -223,15 +210,6 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         for (Part part : Part.values()) {
             notifyUpdated(part);
         }
-    }
-
-    private void beep(final int tone, int delay) {
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                beeper.startTone(tone, 150);
-            }
-        }, delay);
     }
 
     private VolumeApplication getVolumeApplicationContext() {

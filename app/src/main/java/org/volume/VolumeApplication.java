@@ -1,8 +1,10 @@
 package org.volume;
 
 import android.app.Application;
+import android.os.Handler;
 
 import org.volume.di.AudioManagerModule;
+import org.volume.di.BeeperModule;
 import org.volume.di.DaggerSpeedServiceComponent;
 import org.volume.di.SpeedLoggerModule;
 import org.volume.di.PreferencesModule;
@@ -27,6 +29,7 @@ public class VolumeApplication extends Application {
                 .preferencesModule(new PreferencesModule(this))
                 .audioManagerModule(new AudioManagerModule(this))
                 .speedLoggerModule(new SpeedLoggerModule())
+                .beeperModule(new BeeperModule(new Handler()))
                 .build();
     }
 
