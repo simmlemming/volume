@@ -1,6 +1,7 @@
 package org.volume;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
@@ -22,7 +23,7 @@ public class Preferences {
     public List<Integer> getSpeedThresholds() {
         ArrayList<Integer> thresholds = new ArrayList<>();
 
-        String thresholdsFromPrefs = PreferenceManager.getDefaultSharedPreferences(context).getString(context.getString(R.string.pref_key_speed_thresholds), "");
+        String thresholdsFromPrefs = getSharedPreferences().getString(context.getString(R.string.pref_key_speed_thresholds), "");
         if (TextUtils.isEmpty(thresholdsFromPrefs)) {
             return thresholds;
         }
@@ -37,5 +38,22 @@ public class Preferences {
         }
 
         return thresholds;
+    }
+
+    public boolean isLoggingEnabled() {
+        String log = context.getString(R.string.pref_key_log);
+        return getSharedPreferences().getBoolean(log, false);
+    }
+
+    public void registerOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        getSharedPreferences().registerOnSharedPreferenceChangeListener(listener);
+    }
+
+    public void unregisterOnSharedPreferenceChangeListener(SharedPreferences.OnSharedPreferenceChangeListener listener) {
+        getSharedPreferences().unregisterOnSharedPreferenceChangeListener(listener);
+    }
+
+    private SharedPreferences getSharedPreferences() {
+        return PreferenceManager.getDefaultSharedPreferences(context);
     }
 }

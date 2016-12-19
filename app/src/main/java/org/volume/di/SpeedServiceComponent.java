@@ -11,7 +11,7 @@ import dagger.Component;
  */
 
 @Singleton
-@Component(modules = {SpeedManagerModule.class, PreferencesModule.class, AudioManagerModule.class, LogUtilsModule.class})
+@Component(modules = {SpeedManagerModule.class, PreferencesModule.class, AudioManagerModule.class, SpeedLoggerModule.class})
 public interface SpeedServiceComponent {
     void inject(SpeedService service);
 }

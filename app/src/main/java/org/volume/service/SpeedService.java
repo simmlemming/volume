@@ -20,7 +20,7 @@ import org.volume.VolumeApplication;
 import org.volume.manager.NoiseManager;
 import org.volume.manager.SpeedManager;
 import org.volume.manager.VolumeManager;
-import org.volume.util.LogUtils;
+import org.volume.util.SpeedLogger;
 import org.volume.widget.VolumeWidgetProvider;
 
 import javax.inject.Inject;
@@ -53,7 +53,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     @Inject Preferences preferences;
     @Inject VolumeManager volumeManager;
     @Inject NoiseManager noiseManager;
-    @Inject LogUtils log;
+    @Inject SpeedLogger speedLogger;
 
     private Handler handler = new Handler();
     private ToneGenerator beeper;
@@ -69,24 +69,15 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
         getVolumeApplicationContext().getSpeedManagerComponent().inject(this);
 
-//        log = new LogUtils();
-
-//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-//        speedManager = new SpeedManager(locationManager);
-
-//        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-//        volumeManager = new VolumeManager(audioManager, preferences);
-
-//        noiseManager = new NoiseManager();
+        speedLogger.setEnabled(preferences.isLoggingEnabled());
 
         speedManager.setOnSpeedUpdateListener(this);
         volumeManager.setOnVolumeChangeListener(this);
-
-        PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener(this);
+        preferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     public void startManagingVolume() {
-        log.startSession();
+        speedLogger.startSession();
         speedManager.startListening();
         noiseManager.start();
     }
@@ -94,7 +85,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     public void stopManagingVolume() {
         speedManager.stopListening();
         noiseManager.stop();
-        log.stopSession();
+        speedLogger.stopSession();
     }
 
     public boolean isManagingVolume() {
@@ -123,7 +114,8 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         speedManager.stopListening();
         speedManager.setOnSpeedUpdateListener(null);
         volumeManager.setOnVolumeChangeListener(null);
-        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+        preferences.unregisterOnSharedPreferenceChangeListener(this);
+
         super.onDestroy();
     }
 
@@ -135,7 +127,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     @Override
     public void onSpeedChange(int oldSpeed, int newSpeed, long time) {
         volumeManager.onSpeedChange(oldSpeed, newSpeed);
-        log.logSpeedChange(oldSpeed, newSpeed, volumeManager.getCurrentVolume(), noiseManager.getCurrentNoiseLevel(), time);
+        speedLogger.logSpeedChange(oldSpeed, newSpeed, volumeManager.getCurrentVolume(), noiseManager.getCurrentNoiseLevel(), time);
     }
 
     @Override
@@ -153,6 +145,11 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String key) {
         if (key.equals(getString(R.string.pref_key_speed_thresholds))) {
             volumeManager.setSpeedThresholds(preferences.getSpeedThresholds());
+        }
+
+        if (key.equals(getString(R.string.pref_key_log))) {
+            boolean isLoggingEnabled = preferences.isLoggingEnabled();
+            speedLogger.setEnabled(isLoggingEnabled);
         }
     }
 

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import org.volume.VolumeApplication;
 import org.volume.service.SpeedService;
 
 /**
@@ -17,7 +18,7 @@ public class HeadphonesUnpluggedReceiver extends BroadcastReceiver {
         try {
             SpeedService.intentToStopManagingVolume(context).send();
         } catch (PendingIntent.CanceledException e) {
-            Log.e("Volume", "Cannot stop managing volume", e);
+            Log.e(VolumeApplication.TAG, "Cannot stop managing volume", e);
         }
     }
 }

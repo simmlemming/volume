@@ -10,6 +10,7 @@ import android.preference.PreferenceManager;
 import android.util.Log;
 
 import org.volume.R;
+import org.volume.VolumeApplication;
 import org.volume.service.SpeedService;
 
 /**
@@ -27,7 +28,7 @@ public class BluetoothConnectionReceiver extends BroadcastReceiver {
             try {
                 SpeedService.intentToStartManagingVolume(context).send();
             } catch (PendingIntent.CanceledException e) {
-                Log.e("Volume", "Cannot start managing volume", e);
+                Log.e(VolumeApplication.TAG, "Cannot start managing volume", e);
             }
         }
     }

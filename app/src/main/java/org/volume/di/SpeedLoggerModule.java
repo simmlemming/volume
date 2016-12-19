@@ -1,6 +1,6 @@
 package org.volume.di;
 
-import org.volume.util.LogUtils;
+import org.volume.util.SpeedLogger;
 
 import javax.inject.Singleton;
 
@@ -12,11 +12,11 @@ import dagger.Provides;
  */
 
 @Module
-public class LogUtilsModule {
+public class SpeedLoggerModule {
 
     @Provides
     @Singleton
-    LogUtils provideLogUtils() {
-        return new LogUtils();
+    SpeedLogger provideSpeedLogger() {
+        return new SpeedLogger();
     }
 }
