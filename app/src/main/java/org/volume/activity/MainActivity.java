@@ -18,10 +18,17 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.TextView;
 
+import org.volume.Preferences;
 import org.volume.R;
+import org.volume.VolumeApplication;
+import org.volume.di.ApplicationComponent;
+import org.volume.di.DaggerMainActivityComponent;
+import org.volume.di.MainActivityComponent;
 import org.volume.manager.SpeedManager;
-import org.volume.service.SpeedService;
 import org.volume.manager.VolumeManager;
+import org.volume.service.SpeedService;
+
+import javax.inject.Inject;
 
 import static android.media.AudioManager.ADJUST_LOWER;
 import static android.media.AudioManager.ADJUST_RAISE;
@@ -32,6 +39,8 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
     private Button startStopView;
 
     private SpeedService speedService;
+
+    @Inject Preferences preferences;
 
     private ServiceConnection serviceConnection = new ServiceConnection() {
         @Override
@@ -87,11 +96,10 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
     };
 
     private CompoundButton.OnCheckedChangeListener beepCheckedChangeListener = new CompoundButton.OnCheckedChangeListener() {
+
         @Override
         public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-            SharedPreferences.Editor preferences = PreferenceManager.getDefaultSharedPreferences(MainActivity.this).edit();
-            preferences.putBoolean(getString(R.string.pref_key_beep), isChecked);
-            preferences.apply();
+            preferences.setBeepOnSpeedChange(isChecked);
         }
     };
 
@@ -105,6 +113,14 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        ApplicationComponent applicationComponent = ((VolumeApplication) getApplication()).getApplicationComponent();
+        MainActivityComponent component = DaggerMainActivityComponent.builder()
+                .applicationComponent(applicationComponent)
+                .build();
+
+        component.inject(this);
+
         setContentView(R.layout.activity_main);
 
         speedView = (TextView) findViewById(R.id.speed);
@@ -116,8 +132,7 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
         View volDownView = findViewById(R.id.vol_down);
         beepView = (CheckBox) findViewById(R.id.beep_ckeckbox);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        beepView.setChecked(preferences.getBoolean(getString(R.string.pref_key_beep), true));
+        beepView.setChecked(preferences.beepOnSpeedChange());
 
         startStopView.setOnClickListener(startStopClickListener);
         volUpView.setOnClickListener(volumeClickListener);

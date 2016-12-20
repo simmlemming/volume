@@ -8,13 +8,19 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
-import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 
 import org.volume.Preferences;
 import org.volume.R;
 import org.volume.VolumeApplication;
+import org.volume.di.AudioManagerModule;
+import org.volume.di.BeeperModule;
+import org.volume.di.DaggerSpeedServiceComponent;
+import org.volume.di.SpeedLoggerModule;
+import org.volume.di.SpeedManagerModule;
+import org.volume.di.SpeedServiceComponent;
 import org.volume.manager.NoiseManager;
 import org.volume.manager.SpeedManager;
 import org.volume.manager.VolumeManager;
@@ -28,6 +34,7 @@ import javax.inject.Inject;
  * Created by mtkachenko on 09/04/16.
  */
 public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateListener, VolumeManager.OnVolumeChangeListener, SharedPreferences.OnSharedPreferenceChangeListener {
+
     public interface SpeedServiceListener {
         void onSpeedUpdate(int newSpeed);
         void onVolumeUpdate(int newVolume);
@@ -57,7 +64,15 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     public void onCreate() {
         super.onCreate();
 
-        getVolumeApplicationContext().getSpeedManagerComponent().inject(this);
+        SpeedServiceComponent speedManagerComponent = DaggerSpeedServiceComponent.builder()
+                .applicationComponent(getVolumeApplicationContext().getApplicationComponent())
+                .speedManagerModule(new SpeedManagerModule())
+                .audioManagerModule(new AudioManagerModule())
+                .speedLoggerModule(new SpeedLoggerModule())
+                .beeperModule(new BeeperModule(new Handler()))
+                .build();
+
+        speedManagerComponent.inject(this);
 
         speedLogger.setEnabled(preferences.isLoggingEnabled());
 
@@ -122,8 +137,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     @Override
     public void onVolumeChange(int oldLevel, int newLevel, int maxLevel) {
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (preferences.getBoolean(getString(R.string.pref_key_beep), true)) {
+        if (preferences.beepOnSpeedChange()) {
             boolean volumeIncreased = newLevel > oldLevel;
             beeper.beepVolumeChangeTone(volumeIncreased);
         }

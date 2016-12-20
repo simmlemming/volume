@@ -1,15 +1,13 @@
 package org.volume;
 
 import android.app.Application;
-import android.os.Handler;
 
-import org.volume.di.AudioManagerModule;
-import org.volume.di.BeeperModule;
-import org.volume.di.DaggerSpeedServiceComponent;
-import org.volume.di.SpeedLoggerModule;
-import org.volume.di.PreferencesModule;
-import org.volume.di.SpeedServiceComponent;
-import org.volume.di.SpeedManagerModule;
+import org.volume.di.AndroidComponent;
+import org.volume.di.AndroidModule;
+import org.volume.di.ApplicationComponent;
+import org.volume.di.ApplicationModule;
+import org.volume.di.DaggerAndroidComponent;
+import org.volume.di.DaggerApplicationComponent;
 
 /**
  * Created by mtkachenko on 16/12/16.
@@ -18,22 +16,24 @@ import org.volume.di.SpeedManagerModule;
 public class VolumeApplication extends Application {
     public static String TAG = "Volume";
 
-    private SpeedServiceComponent speedManagerComponent;
+    private ApplicationComponent applicationComponent;
+    private AndroidComponent androidComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
 
-        speedManagerComponent = DaggerSpeedServiceComponent.builder()
-                .speedManagerModule(new SpeedManagerModule(this))
-                .preferencesModule(new PreferencesModule(this))
-                .audioManagerModule(new AudioManagerModule(this))
-                .speedLoggerModule(new SpeedLoggerModule())
-                .beeperModule(new BeeperModule(new Handler()))
+        androidComponent = DaggerAndroidComponent.builder()
+                .androidModule(new AndroidModule(this))
+                .build();
+
+        applicationComponent = DaggerApplicationComponent.builder()
+                .androidComponent(androidComponent)
+                .applicationModule(new ApplicationModule(this))
                 .build();
     }
 
-    public SpeedServiceComponent getSpeedManagerComponent() {
-        return speedManagerComponent;
+    public ApplicationComponent getApplicationComponent() {
+        return applicationComponent;
     }
 }

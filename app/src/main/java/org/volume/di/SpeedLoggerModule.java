@@ -1,8 +1,7 @@
 package org.volume.di;
 
+import org.volume.di.scope.OnePerAppComponent;
 import org.volume.util.SpeedLogger;
-
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -15,7 +14,7 @@ import dagger.Provides;
 public class SpeedLoggerModule {
 
     @Provides
-    @Singleton
+    @OnePerAppComponent
     SpeedLogger provideSpeedLogger() {
         return new SpeedLogger();
     }

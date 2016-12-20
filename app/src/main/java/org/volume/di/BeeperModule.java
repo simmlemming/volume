@@ -3,9 +3,8 @@ package org.volume.di;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 
+import org.volume.di.scope.OnePerAppComponent;
 import org.volume.util.Beeper;
-
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -28,7 +27,7 @@ public class BeeperModule {
     }
 
     @Provides
-    @Singleton
+    @OnePerAppComponent
     Beeper provideBeeper() {
         return new Beeper(handler);
     }

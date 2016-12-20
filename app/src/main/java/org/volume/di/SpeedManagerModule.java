@@ -1,11 +1,9 @@
 package org.volume.di;
 
-import android.content.Context;
 import android.location.LocationManager;
 
+import org.volume.di.scope.OnePerAppComponent;
 import org.volume.manager.SpeedManager;
-
-import javax.inject.Singleton;
 
 import dagger.Module;
 import dagger.Provides;
@@ -16,16 +14,9 @@ import dagger.Provides;
 
 @Module
 public class SpeedManagerModule {
-    private final Context context;
-
-    public SpeedManagerModule(Context context) {
-        this.context = context;
-    }
-
-    @Singleton
     @Provides
-    SpeedManager provideSpeedManager() {
-        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+    @OnePerAppComponent
+    SpeedManager provideSpeedManager(LocationManager locationManager) {
         return new SpeedManager(locationManager);
     }
 }

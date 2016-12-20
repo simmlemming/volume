@@ -1,8 +1,7 @@
 package org.volume;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
+import android.content.res.Resources;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -14,16 +13,18 @@ import java.util.List;
  */
 
 public class Preferences {
-    private final Context context;
+    private final SharedPreferences sharedPreferences;
+    private final Resources resources;
 
-    public Preferences(Context context) {
-        this.context = context;
+    public Preferences(SharedPreferences sharedPreferences, Resources resources) {
+        this.sharedPreferences = sharedPreferences;
+        this.resources = resources;
     }
 
     public List<Integer> getSpeedThresholds() {
         ArrayList<Integer> thresholds = new ArrayList<>();
 
-        String thresholdsFromPrefs = getSharedPreferences().getString(context.getString(R.string.pref_key_speed_thresholds), "");
+        String thresholdsFromPrefs = getSharedPreferences().getString(resources.getString(R.string.pref_key_speed_thresholds), "");
         if (TextUtils.isEmpty(thresholdsFromPrefs)) {
             return thresholds;
         }
@@ -40,8 +41,20 @@ public class Preferences {
         return thresholds;
     }
 
+    public boolean beepOnSpeedChange() {
+        String beep = resources.getString(R.string.pref_key_beep);
+        return sharedPreferences.getBoolean(beep, true);
+    }
+
+    public void setBeepOnSpeedChange(boolean beep) {
+        String key = resources.getString(R.string.pref_key_beep);
+        sharedPreferences.edit()
+                .putBoolean(key, beep)
+                .apply();
+    }
+
     public boolean isLoggingEnabled() {
-        String log = context.getString(R.string.pref_key_log);
+        String log = resources.getString(R.string.pref_key_log);
         return getSharedPreferences().getBoolean(log, false);
     }
 
@@ -54,6 +67,6 @@ public class Preferences {
     }
 
     private SharedPreferences getSharedPreferences() {
-        return PreferenceManager.getDefaultSharedPreferences(context);
+        return sharedPreferences;
     }
 }
