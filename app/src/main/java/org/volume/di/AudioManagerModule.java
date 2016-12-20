@@ -19,7 +19,7 @@ public class AudioManagerModule {
 
     @Provides
     @OnePerAppComponent
-    VolumeManager provideAudioManager(AudioManager audioManager, Preferences preferences) {
+    VolumeManager provideVolumeManager(AudioManager audioManager, Preferences preferences) {
         return new VolumeManager(audioManager, preferences);
     }
 
