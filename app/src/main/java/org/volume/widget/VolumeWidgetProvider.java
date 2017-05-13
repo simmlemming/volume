@@ -6,11 +6,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.widget.RemoteViews;
 
-import org.volume.activity.MainActivity;
 import org.volume.R;
+import org.volume.activity.MainActivity;
 
-import static org.volume.service.SpeedService.intentToStartManagingVolume;
-import static org.volume.service.SpeedService.intentToStopManagingVolume;
+import static org.volume.service.SpeedService.intentToToggle;
 
 /**
  * Created by mtkachenko on 12/04/16.
@@ -28,7 +27,7 @@ public class VolumeWidgetProvider extends AppWidgetProvider {
     public static RemoteViews getRemoteViews(Context context, boolean isActive, int volumeLevel) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
 
-        views.setOnClickPendingIntent(R.id.start_stop, isActive ? intentToStopManagingVolume(context) : intentToStartManagingVolume(context));
+        views.setOnClickPendingIntent(R.id.start_stop, intentToToggle(context));
         views.setImageViewResource(R.id.start_stop, isActive ? R.drawable.ic_on : R.drawable.ic_off);
 
         int textColor = isActive ? R.color.text_state_active : R.color.text_state_passive;

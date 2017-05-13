@@ -43,6 +43,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
     private static final String ACTION_STOP_LISTENING = "stop_listening";
     private static final String ACTION_START_LISTENING = "start_listening";
+    private static final String ACTION_TOGGLE = "toggle";
 
     private enum Part {
         VOLUME,
@@ -109,6 +110,14 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
 
         if (ACTION_START_LISTENING.equals(intent.getAction())) {
             startManagingVolume();
+        }
+
+        if (ACTION_TOGGLE.equals(intent.getAction())) {
+            if (isManagingVolume()) {
+                stopManagingVolume();
+            } else {
+                startManagingVolume();
+            }
         }
 
         return START_STICKY;
@@ -239,6 +248,12 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     public static PendingIntent intentToStopManagingVolume(Context context) {
         Intent speedService = new Intent(context, SpeedService.class);
         speedService.setAction(ACTION_STOP_LISTENING);
+        return PendingIntent.getService(context, 0, speedService, PendingIntent.FLAG_CANCEL_CURRENT);
+    }
+
+    public static PendingIntent intentToToggle(Context context) {
+        Intent speedService = new Intent(context, SpeedService.class);
+        speedService.setAction(ACTION_TOGGLE);
         return PendingIntent.getService(context, 0, speedService, PendingIntent.FLAG_CANCEL_CURRENT);
     }
 
