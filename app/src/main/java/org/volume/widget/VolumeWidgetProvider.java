@@ -29,7 +29,7 @@ public class VolumeWidgetProvider extends AppWidgetProvider {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.widget);
 
         views.setOnClickPendingIntent(R.id.start_stop, isActive ? intentToStopManagingVolume(context) : intentToStartManagingVolume(context));
-        views.setTextViewText(R.id.start_stop, isActive ? context.getString(R.string.off) : context.getString(R.string.on));
+        views.setImageViewResource(R.id.start_stop, isActive ? R.drawable.ic_on : R.drawable.ic_off);
 
         int textColor = isActive ? R.color.text_state_active : R.color.text_state_passive;
         views.setTextColor(R.id.level, context.getResources().getColor(textColor));
