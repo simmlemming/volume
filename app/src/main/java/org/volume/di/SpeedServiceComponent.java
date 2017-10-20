@@ -10,7 +10,7 @@ import dagger.Component;
  */
 
 @OnePerAppComponent
-@Component(modules = {SpeedManagerModule.class, AudioManagerModule.class, SpeedLoggerModule.class, BeeperModule.class},
+@Component(modules = {SpeedManagerModule.class, AudioManagerModule.class, SpeedLoggerModule.class, BeeperModule.class, NotificationFactoryModule.class},
             dependencies = {ApplicationComponent.class})
 
 public interface SpeedServiceComponent {

@@ -18,6 +18,7 @@ import org.volume.VolumeApplication;
 import org.volume.di.AudioManagerModule;
 import org.volume.di.BeeperModule;
 import org.volume.di.DaggerSpeedServiceComponent;
+import org.volume.di.NotificationFactoryModule;
 import org.volume.di.SpeedLoggerModule;
 import org.volume.di.SpeedManagerModule;
 import org.volume.di.SpeedServiceComponent;
@@ -25,6 +26,7 @@ import org.volume.manager.NoiseManager;
 import org.volume.manager.SpeedManager;
 import org.volume.manager.VolumeManager;
 import org.volume.util.Beeper;
+import org.volume.util.NotificationFactory;
 import org.volume.util.SpeedLogger;
 import org.volume.widget.VolumeWidgetProvider;
 
@@ -57,6 +59,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     @Inject NoiseManager noiseManager;
     @Inject SpeedLogger speedLogger;
     @Inject Beeper beeper;
+    @Inject NotificationFactory notificationFactory;
 
     @Nullable
     private SpeedServiceListener listener;
@@ -64,13 +67,13 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     @Override
     public void onCreate() {
         super.onCreate();
-
         SpeedServiceComponent speedManagerComponent = DaggerSpeedServiceComponent.builder()
                 .applicationComponent(getVolumeApplicationContext().getApplicationComponent())
                 .speedManagerModule(new SpeedManagerModule())
                 .audioManagerModule(new AudioManagerModule())
                 .speedLoggerModule(new SpeedLoggerModule())
                 .beeperModule(new BeeperModule(new Handler()))
+                .notificationFactoryModule(new NotificationFactoryModule())
                 .build();
 
         speedManagerComponent.inject(this);
@@ -83,15 +86,21 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
     }
 
     public void startManagingVolume() {
+        startForeground(1, notificationFactory.newNotification(this));
+
         speedLogger.startSession();
         speedManager.startListening();
         noiseManager.start();
     }
 
     public void stopManagingVolume() {
+        stopForeground(true);
+
         speedManager.stopListening();
         noiseManager.stop();
         speedLogger.stopSession();
+
+        stopSelf();
     }
 
     public boolean isManagingVolume() {
