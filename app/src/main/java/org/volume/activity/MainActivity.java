@@ -175,9 +175,10 @@ public class MainActivity extends AppCompatActivity implements SpeedService.Spee
             noiseView.setText(getString(R.string.noise_level_unknown));
         } else {
             speedView.setText(getString(R.string.speed, newSpeed));
-            int noiseRaw = speedService.getNoiseManager().getCurrentNoiseLevel();
-            long noiseDb = speedService.getNoiseManager().getCurrentNoiseLevelDb();
-            noiseView.setText(getString(R.string.noise, noiseRaw, noiseDb));
+//            int noiseRaw = speedService.getNoiseManager().getCurrentNoiseLevel();
+//            long noiseDb = speedService.getNoiseManager().getCurrentNoiseLevelDb();
+//            noiseView.setText(getString(R.string.noise, noiseRaw, noiseDb));
+            noiseView.setText(getString(R.string.noise_level_unknown)); // noise levels are large ints, they don't fit the screen
         }
     }
 
