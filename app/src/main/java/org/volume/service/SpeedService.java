@@ -196,7 +196,7 @@ public class SpeedService extends Service implements SpeedManager.OnSpeedUpdateL
         beeper.beepStartTone();
         notifyUpdated(Part.STATE);
 
-        volumeManager.setVolumePct(0.6666666f);
+        volumeManager.setVolumePct(0.75f);
         notifyUpdated(Part.VOLUME);
     }
 

@@ -17,6 +17,9 @@ import static android.media.AudioManager.STREAM_MUSIC;
  * Created by mtkachenko on 06/04/16.
  */
 public class VolumeManager {
+    //TODO: replace steps with percentage to not depend on devices differences
+    public static int VOLUME_ADJUSTMENTS_MULTIPLIER = 2;
+
     public interface OnVolumeChangeListener {
         void onVolumeChange(int oldLevel, int newLevel, int maxLevel);
     }
@@ -51,7 +54,10 @@ public class VolumeManager {
 
     private void adjustVolume(int direction) {
         int oldLevel = getCurrentVolume();
-        audioManager.adjustStreamVolume(STREAM_MUSIC, direction, FLAG_PLAY_SOUND);
+
+        for (int i = 0; i < VOLUME_ADJUSTMENTS_MULTIPLIER; i++) {
+            audioManager.adjustStreamVolume(STREAM_MUSIC, direction, FLAG_PLAY_SOUND);
+        }
         notifyVolumeChange(oldLevel);
     }
 

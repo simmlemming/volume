@@ -14,6 +14,7 @@ import static java.util.Arrays.asList;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -50,37 +51,37 @@ public class VolumeManagerTest {
     @Test
     public void speedIncreasesPastSecondThreshold() {
         volumeManager.onSpeedChange(SECOND_THRESHOLD - 2, SECOND_THRESHOLD + 2);
-        verify(audioManager).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_RAISE), anyInt());
+        verify(audioManager, times(VolumeManager.VOLUME_ADJUSTMENTS_MULTIPLIER)).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_RAISE), anyInt());
     }
 
     @Test
     public void speedIncreasesToThreshold() {
         volumeManager.onSpeedChange(SECOND_THRESHOLD - 2, SECOND_THRESHOLD);
-        verify(audioManager).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_RAISE), anyInt());
+        verify(audioManager, times(VolumeManager.VOLUME_ADJUSTMENTS_MULTIPLIER)).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_RAISE), anyInt());
     }
 
     @Test
     public void speedDecreasesFromThreshold() {
         volumeManager.onSpeedChange(SECOND_THRESHOLD, SECOND_THRESHOLD - 2);
-        verify(audioManager).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_LOWER), anyInt());
+        verify(audioManager, times(VolumeManager.VOLUME_ADJUSTMENTS_MULTIPLIER)).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_LOWER), anyInt());
     }
 
     @Test
     public void speedIncreasesPastFirstThreshold() {
         volumeManager.onSpeedChange(FIRST_THRESHOLD - 2, FIRST_THRESHOLD + 2);
-        verify(audioManager).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_RAISE), anyInt());
+        verify(audioManager, times(VolumeManager.VOLUME_ADJUSTMENTS_MULTIPLIER)).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_RAISE), anyInt());
     }
 
     @Test
     public void speedDecreasesPastSecondThreshold() {
         volumeManager.onSpeedChange(SECOND_THRESHOLD + 2, SECOND_THRESHOLD - 2);
-        verify(audioManager).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_LOWER), anyInt());
+        verify(audioManager, times(VolumeManager.VOLUME_ADJUSTMENTS_MULTIPLIER)).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_LOWER), anyInt());
     }
 
     @Test
     public void speedDecreasesPastFirstThreshold() {
         volumeManager.onSpeedChange(FIRST_THRESHOLD + 2, FIRST_THRESHOLD - 2);
-        verify(audioManager).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_LOWER), anyInt());
+        verify(audioManager, times(VolumeManager.VOLUME_ADJUSTMENTS_MULTIPLIER)).adjustStreamVolume(eq(STREAM_MUSIC), eq(ADJUST_LOWER), anyInt());
     }
 
     @After
